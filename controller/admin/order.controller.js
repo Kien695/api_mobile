@@ -4,7 +4,7 @@ module.exports.getOrder = async (req, res) => {
   try {
     const order = await Order.find({ deleted: false })
       .sort({ createdAt: -1 })
-      .populate("productItems.productId", "_id name images brand size")
+      .populate("productItems.productId", "_id title image brand size")
       .populate("userId", "name email mobile");
     if (!order || order.length === 0) {
       return res.json({
@@ -12,20 +12,15 @@ module.exports.getOrder = async (req, res) => {
         message: "Không có đơn hàng nào.",
       });
     }
-    const filterOrder = order
-      .map((order) => ({
-        ...order._doc,
-        productItems: productItems.filter((item) => item.deleted == false),
-      }))
-      .filter((order) => order.productItems.length > 0);
+
     res.status(200).json({
       success: true,
-      data: filterOrder,
+      data: order,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message,
       error: true,
     });
   }

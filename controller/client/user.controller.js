@@ -1,5 +1,3 @@
-const AdminUser = require("../../model/userAdmin.model");
-
 const ClientUser = require("../../model/userClient.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -9,7 +7,7 @@ module.exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const user = await AdminUser.findOne({
+    const user = await ClientUser.findOne({
       email: email,
     });
     if (user) {
@@ -19,7 +17,7 @@ module.exports.register = async (req, res) => {
     }
     const salt = await bcryptjs.genSalt(10);
     const hashPassword = await bcryptjs.hash(password, salt);
-    await AdminUser.create({
+    await ClientUser.create({
       name: name,
       email: email,
       password: hashPassword,
@@ -41,7 +39,7 @@ module.exports.register = async (req, res) => {
 module.exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await AdminUser.findOne({
+    const user = await ClientUser.findOne({
       email: email,
     });
     if (!user) {
@@ -80,9 +78,10 @@ module.exports.login = async (req, res) => {
 //get account
 module.exports.getAccount = async (req, res) => {
   try {
-    const user = await AdminUser.findById(res.locals.userId)
-      .select("-password")
-      .populate("role");
+    const user = await ClientUser.findById(res.locals.userId).select(
+      "-password",
+    );
+
     return res.status(200).json({
       error: false,
       data: user,
@@ -100,8 +99,8 @@ module.exports.getAccount = async (req, res) => {
 module.exports.userAvatar = async (req, res) => {
   try {
     const userId = res.locals.userId;
-    console.log(userId);
-    let user = await AdminUser.findById(userId);
+
+    let user = await ClientUser.findById(userId);
     if (!user) {
       return res.status(400).json({
         error: true,
@@ -139,7 +138,7 @@ module.exports.updateUser = async (req, res) => {
     const userId = res.locals.userId;
 
     // Tìm user hiện tại
-    const existUser = await AdminUser.findById(userId);
+    const existUser = await ClientUser.findById(userId);
     if (!existUser) {
       return res.status(400).json({
         error: true,
@@ -148,7 +147,7 @@ module.exports.updateUser = async (req, res) => {
       });
     }
     // Cập nhật user
-    const updatedUser = await AdminUser.findByIdAndUpdate(userId, req.body, {
+    const updatedUser = await ClientUser.findByIdAndUpdate(userId, req.body, {
       new: true,
     });
     return res.status(200).json({
@@ -156,136 +155,6 @@ module.exports.updateUser = async (req, res) => {
       error: false,
       success: true,
       user: updatedUser,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      success: false,
-      message: error.message || error,
-    });
-  }
-};
-//[get] // get all account admin
-module.exports.getAllAccount = async (req, res) => {
-  try {
-    const account = await AdminUser.find().select("-password").populate("role");
-    if (!account) {
-      return res.json({
-        error: true,
-        success: false,
-      });
-    }
-    return res.status(200).json({
-      error: false,
-      success: true,
-      data: account,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      success: false,
-      message: error.message || error,
-    });
-  }
-};
-//[get] // get all account Client
-module.exports.getAllClientAccounts = async (req, res) => {
-  try {
-    const account = await ClientUser.find({ deleted: false }).select(
-      "-password",
-    );
-
-    if (!account) {
-      return res.json({
-        error: true,
-        success: false,
-      });
-    }
-    return res.status(200).json({
-      error: false,
-      success: true,
-      data: account,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      success: false,
-      message: error.message || error,
-    });
-  }
-};
-//[patch] //delete user client
-module.exports.deleteClient = async (req, res) => {
-  try {
-    // Tìm đúng tài khoản theo id
-    const account = await ClientUser.findById(req.params.id);
-
-    // Nếu không tìm thấy
-    if (!account) {
-      return res.status(404).json({
-        error: true,
-        success: false,
-        message: "Không tìm thấy tài khoản",
-      });
-    }
-
-    // Nếu hợp lệ thì xóa
-    await ClientUser.findByIdAndUpdate(req.params.id, { deleted: true });
-
-    return res.status(200).json({
-      error: false,
-      success: true,
-      message: "Xóa tài khoản thành công",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      success: false,
-      message: error.message || error,
-    });
-  }
-};
-//[patch] //update role user
-module.exports.updateRoleUser = async (req, res) => {
-  try {
-    const update = await AdminUser.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    return res.status(200).json({
-      error: false,
-      success: true,
-      message: "Cập nhật quyền thành công thành công",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      success: false,
-      message: error.message || error,
-    });
-  }
-};
-//[delete] /delete Account
-module.exports.deleteAccount = async (req, res) => {
-  try {
-    // Tìm đúng tài khoản theo id
-    const account = await AdminUser.findById(req.params.id);
-
-    // Nếu không tìm thấy
-    if (!account) {
-      return res.status(404).json({
-        error: true,
-        success: false,
-        message: "Không tìm thấy tài khoản",
-      });
-    }
-
-    // Nếu hợp lệ thì xóa
-    await AdminUser.findByIdAndDelete(req.params.id);
-
-    return res.status(200).json({
-      error: false,
-      success: true,
-      message: "Xóa tài khoản thành công",
     });
   } catch (error) {
     return res.status(500).json({

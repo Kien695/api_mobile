@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer();
 const validate = require("../validates/auth.validate");
-const controller = require("../controller/admin/user.controller");
+const controller = require("../controller/client/user.controller");
 const middleware = require("../middleware/auth.middleware");
 const uploadCloud = require("../middleware/uploadCloud.middleware");
 router.get("/", middleware.auth, controller.getAccount);
@@ -17,9 +17,4 @@ router.put(
   controller.userAvatar,
 );
 router.patch("/update-user", middleware.auth, controller.updateUser);
-router.get("/get-all-user", middleware.auth, controller.getAllAccount);
-router.get("/get-all-client", middleware.auth, controller.getAllClientAccounts);
-router.patch("/deletedClient/:id", middleware.auth, controller.deleteClient);
-router.patch("/update-role/:id", middleware.auth, controller.updateRoleUser);
-router.delete("/deleted/:id", middleware.auth, controller.deleteAccount);
 module.exports = router;

@@ -10,6 +10,14 @@ const productSchema = new mongoose.Schema(
     countInStock: Number,
     numReview: Number,
     rating: Number,
+    size: {
+      type: [String],
+      default: [],
+    },
+    sale: {
+      type: Number,
+      default: 0,
+    },
     deleted: {
       type: Boolean,
       default: false,
