@@ -3,7 +3,7 @@ services:
     build: .
     image: tankien/api_mobile:v0
     platform: linux/amd64
-    container_name: be-container
+    container_name: mobile-container
     ports:
       - "5000:5000"
     env_file:
