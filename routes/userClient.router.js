@@ -17,4 +17,15 @@ router.put(
   controller.userAvatar,
 );
 router.patch("/update-user", middleware.auth, controller.updateUser);
+router.post("/forgot-password", controller.forgotPassword);
+router.post(
+  "/verify-password",
+  validate.verify,
+  controller.verifyForgotPassword,
+);
+router.post(
+  "/reset-password",
+  validate.resestPassword,
+  controller.resetPassword,
+);
 module.exports = router;

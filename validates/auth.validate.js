@@ -44,3 +44,32 @@ module.exports.login = (req, res, next) => {
   }
   next();
 };
+module.exports.verify = (req, res, next) => {
+  const { email, otp } = req.body;
+  if (!otp || !email) {
+    res.status(400).json({
+      message: "Vui lòng nhập đầy đủ thông tin",
+      error: true,
+      success: false,
+    });
+  }
+  next();
+};
+module.exports.resestPassword = (req, res, next) => {
+  const { email, newPassword, confirmPassword } = req.body;
+  if (!email || !newPassword || !confirmPassword) {
+    return res.status(400).json({
+      error: true,
+      success: false,
+      message: "Vui lòng nhập đầy đủ thông tin",
+    });
+  }
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({
+      error: true,
+      success: false,
+      message: "Mật khẩu mới và xác nhận mật khẩu mới không trùng khớp",
+    });
+  }
+  next();
+};

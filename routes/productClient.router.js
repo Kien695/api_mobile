@@ -4,4 +4,5 @@ const controller = require("../controller/client/product.controller");
 
 router.get("/all", controller.getAllProduct);
 router.get("/:id", controller.detailProduct);
+router.post("/filter-ai", controller.fetchAIFilteredProducts);
 module.exports = router;

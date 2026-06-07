@@ -1,6 +1,8 @@
 const ClientUser = require("../../model/userClient.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { sendMail } = require("../../config/sendMail");
+const UserClient = require("../../model/userClient.model");
 const cloudinary = require("cloudinary").v2;
 //register
 module.exports.register = async (req, res) => {
@@ -155,6 +157,120 @@ module.exports.updateUser = async (req, res) => {
       error: false,
       success: true,
       user: updatedUser,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//forgotPassword
+module.exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await UserClient.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({
+        message: "Email không tồn tại",
+        success: false,
+        error: true,
+      });
+    }
+    let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const userId = user._id;
+    const updateUser = await UserClient.findByIdAndUpdate(
+      userId,
+      {
+        otp: verifyCode,
+        otpExpires: Date.now() + 600000,
+      },
+      {
+        new: true,
+      },
+    );
+    const subject = "Mã OTP xác minh";
+    const html = `Mã OTP lấy lại mật khẩu là: <b style="color: green;">${verifyCode}</b>. Thời hạn sử dụng là: ${updateUser.otpExpires}`;
+    const verifyEmail = await sendMail(email, subject, html);
+    return res.json({
+      message: "Kiểm tra email của bạn",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//verify forgot-password
+module.exports.verifyForgotPassword = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await UserClient.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({
+        message: "Email không tồn tại",
+        success: false,
+        error: true,
+      });
+    }
+    if (otp !== user.otp) {
+      return res.status(400).json({
+        message: "OTP không hợp lệ",
+        success: false,
+        error: true,
+      });
+    }
+    const currentTime = Date.now();
+    if (user.otpExpires < currentTime) {
+      return res.status(400).json({
+        message: "OTP đã hết hạn",
+        success: false,
+        error: true,
+      });
+    }
+    user.otp = "";
+    user.otpExpires = "";
+    await user.save();
+    return res.status(200).json({
+      error: false,
+      success: true,
+      message: "OTP đã được xác minh",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//reset password
+module.exports.resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    const user = await UserClient.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({
+        message: "Email không tồn tại!",
+        success: false,
+        error: true,
+      });
+    }
+
+    const salt = await bcryptjs.genSalt(10);
+    const hashPassword = await bcryptjs.hash(newPassword, salt);
+    user.password = hashPassword;
+    await user.save();
+    return res.status(200).json({
+      error: false,
+      success: true,
+      message: "Đổi mật khẩu thành công!",
     });
   } catch (error) {
     return res.status(500).json({

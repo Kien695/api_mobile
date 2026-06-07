@@ -70,11 +70,11 @@ module.exports.deleteCartItem = async (req, res) => {
   try {
     const userId = res.locals.userId;
     const productId = req.body.productId;
-    const size = req.body.size || "";
+
     const cart = await Cart.findOne({ user_id: userId });
     if (cart) {
       const index = cart.item_carts.findIndex(
-        (item) => item.productId.toString() === productId && item.size == size,
+        (item) => item.productId.toString() === productId,
       );
       if (index === -1) {
         return res.status(404).json({

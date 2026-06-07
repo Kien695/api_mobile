@@ -113,3 +113,25 @@ module.exports.deleteProduct = async (req, res) => {
     });
   }
 };
+//get product to select voucher
+module.exports.getProductSelect = async (req, res) => {
+  try {
+    const products = await Product.find({
+      deleted: false,
+    })
+      .select("_id title")
+      .sort({
+        createdAt: -1,
+      });
+
+    res.json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

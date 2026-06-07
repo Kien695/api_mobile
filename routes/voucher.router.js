@@ -1,0 +1,10 @@
+const express = require("express");
+const router = express.Router();
+const controller = require("../controller/admin/voucher.controller");
+const middleware = require("../middleware/auth.middleware");
+router.get("/all", controller.getVouchers);
+router.post("/create", controller.createVoucher);
+router.patch("/edit/:id", controller.editVoucher);
+router.delete("/deleted/:id", controller.deleteVoucher);
+router.get("/getVoucher/:id", controller.getVoucherByProduct);
+module.exports = router;

@@ -11,6 +11,8 @@ const bannerRouter = require("./banner.router");
 const roleRouter = require("./role.router");
 const cartRouter = require("./cart.router");
 const myListRouter = require("./myList.router");
+const reviewProductRouter = require("./reviewProduct.router");
+const voucherRouter = require("./voucher.router");
 module.exports = (app) => {
   app.use("/auth", userAdminRouter);
   app.use("/authClient", userClientRouter);
@@ -22,4 +24,6 @@ module.exports = (app) => {
   app.use("/cart", middleware.auth, cartRouter);
   app.use("/myList", middleware.auth, myListRouter);
   app.use("/order", middleware.auth, orderRouter);
+  app.use("/reviewProduct", middleware.auth, reviewProductRouter);
+  app.use("/voucher", middleware.auth, voucherRouter);
 };

@@ -74,10 +74,11 @@ module.exports.delete = async (req, res) => {
 //permission
 module.exports.permission = async (req, res) => {
   try {
-    const permissons = req.body;
-    for (const item of permissons) {
+    const permissions = req.body;
+    console.log(permissions);
+    for (const item of permissions) {
       const role = await Role.findByIdAndUpdate(
-        item.roleId,
+        item.id,
         { permissions: item.permissions },
         { new: true },
       );

@@ -5,9 +5,11 @@ const upload = multer();
 const validate = require("../validates/auth.validate");
 const controller = require("../controller/admin/product.controller");
 const uploadCloud = require("../middleware/uploadCloud.middleware");
+
 router.get("/", controller.getProduct);
 router.post(
   "/create",
+
   upload.single("image"),
   uploadCloud.uploadOne,
   controller.create,
@@ -19,4 +21,6 @@ router.patch(
   controller.editProduct,
 );
 router.delete("/deleted/:id", controller.deleteProduct);
+
+router.get("/getProductVoucher", controller.getProductSelect);
 module.exports = router;

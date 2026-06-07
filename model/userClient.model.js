@@ -17,6 +17,12 @@ const UserClientSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    otp: {
+      type: String,
+    },
+    otpExpires: {
+      type: Date,
+    },
     status: {
       type: String,
       default: "active",

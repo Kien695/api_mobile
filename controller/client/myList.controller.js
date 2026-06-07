@@ -23,16 +23,20 @@ module.exports.addToMyList = async (req, res) => {
 //xóa
 module.exports.deleteMyList = async (req, res) => {
   try {
-    const myListItem = await MyList.findById(req.params.id);
+    const myListItem = await MyList.find({
+      product: req.params.id,
+      userId: res.locals.userId,
+    });
+
     if (!myListItem) {
-      res.status(400).json({
+      return res.status(404).json({
         message: "Không tìm thấy",
         error: true,
         success: false,
       });
     }
     const deleteItem = await MyList.findOneAndDelete({
-      _id: req.params.id,
+      product: req.params.id,
       userId: res.locals.userId,
     });
     return res.status(200).json({
